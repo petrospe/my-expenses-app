@@ -1,0 +1,131 @@
+[
+  {
+    "id": 1,
+    "code": "Α1",
+    "category": "Γενικά Κοινόχρηστα",
+    "description": "ΔΕΗ Κοινόχρηστων Χώρων",
+    "column": 14,
+    "amount": 100,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 2,
+    "code": "Α2",
+    "category": "",
+    "description": "Καθαρισμός Κοινόχρηστων Χώρων",
+    "column": 14,
+    "amount": 70,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 3,
+    "code": "Α3",
+    "category": "",
+    "description": "Υλικά Αναλώσιμα (Λάμπες κλπ)",
+    "column": 14,
+    "amount": 10,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 4,
+    "code": "Β1",
+    "category": "Ανελκυστήρας",
+    "description": "Συντήρηση Ανελκυστήρα",
+    "column": 12,
+    "amount": 50,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 5,
+    "code": "Γ1",
+    "category": "Έξοδα Κήπου",
+    "description": "Συντήρηση Κήπου",
+    "column": 13,
+    "amount": 60,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 6,
+    "code": "Γ2",
+    "category": "",
+    "description": "ΕΥΔΑΠ (Νερό) Κοινόχρηστων Χώρων",
+    "column": 13,
+    "amount": 20,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 7,
+    "code": "Δ1",
+    "category": "Θέρμανση",
+    "description": "Πετρέλαιο Αυτόνομης Θέρμανσης",
+    "column": "\"Θέρμανση\"",
+    "amount": 700,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 8,
+    "code": "Δ2",
+    "category": "",
+    "description": "Συντήρηση Καυστήρα",
+    "column": 16,
+    "amount": 70,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 9,
+    "code": "Ε1",
+    "category": "Έξοδα Ιδιοκτητών",
+    "description": "Συντήρηση Πολυκατοικίας",
+    "column": 13,
+    "amount": 100,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 10,
+    "code": "Ζ1",
+    "category": "Λοιπά Έξοδα",
+    "description": "Πάγιο Αποθεματικό",
+    "column": 13,
+    "amount": 200,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 11,
+    "code": "Η1",
+    "category": "Διαχείριση",
+    "description": "Αμοιβή Διαχειριστή",
+    "column": 13,
+    "amount": 80,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 12,
+    "code": "Η2",
+    "category": "",
+    "description": "Έκδοση Κοινοχρήστων",
+    "column": "Σε ίσα μέρη",
+    "amount": 20,
+    "date": "2025-12-03",
+    "periodId": 1764850843599
+  },
+  {
+    "id": 17,
+    "code": "Α1",
+    "category": "Γενικά Κοινόχρηστα",
+    "description": "ΔΕΗ Κοινόχρηστων Χώρων",
+    "column": 14,
+    "amount": 350,
+    "date": "2025-11-11"
+  }
+]
