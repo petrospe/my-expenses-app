@@ -165,13 +165,110 @@ app.post('/api/expenses/sync', (req, res) => {
   }
 });
 
-// Get tenants
+// Tenants
+
+// Get all tenants
 app.get('/api/tenants', (req, res) => {
   try {
     const tenants = readJSONFile('tenants.json');
     res.json(tenants);
   } catch (error) {
     res.status(500).json({ error: 'Failed to load tenants' });
+  }
+});
+
+// Get single tenant by ID
+app.get('/api/tenants/:id', (req, res) => {
+  try {
+    const tenants = readJSONFile('tenants.json');
+    const tenant = tenants.find(t => t.id === parseInt(req.params.id));
+    if (tenant) {
+      res.json(tenant);
+    } else {
+      res.status(404).json({ error: 'Tenant not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load tenant' });
+  }
+});
+
+// Create new tenant
+app.post('/api/tenants', (req, res) => {
+  try {
+    const tenants = readJSONFile('tenants.json');
+    const newTenant = {
+      id: tenants.length > 0 ? Math.max(...tenants.map(t => t.id)) + 1 : 1,
+      code: req.body.code || '',
+      floor: req.body.floor || '',
+      area: parseFloat(req.body.area) || 0,
+      owner: req.body.owner || { name: '', phone: '', mobile: '' },
+      tenant: req.body.tenant || { name: '', phone: '', mobile: '' },
+      coefficients: req.body.coefficients || {
+        elevator: 0,
+        heating: 0,
+        common: 0,
+        fi: 0,
+        emergency: 0,
+        ei: 0
+      }
+    };
+
+    tenants.push(newTenant);
+    
+    if (writeJSONFile('tenants.json', tenants)) {
+      res.status(201).json(newTenant);
+    } else {
+      res.status(500).json({ error: 'Failed to save tenant' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create tenant' });
+  }
+});
+
+// Update tenant
+app.put('/api/tenants/:id', (req, res) => {
+  try {
+    const tenants = readJSONFile('tenants.json');
+    const index = tenants.findIndex(t => t.id === parseInt(req.params.id));
+    
+    if (index === -1) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    tenants[index] = {
+      ...tenants[index],
+      ...req.body,
+      id: tenants[index].id, // Don't allow ID changes
+      coefficients: req.body.coefficients || tenants[index].coefficients
+    };
+
+    if (writeJSONFile('tenants.json', tenants)) {
+      res.json(tenants[index]);
+    } else {
+      res.status(500).json({ error: 'Failed to update tenant' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update tenant' });
+  }
+});
+
+// Delete tenant
+app.delete('/api/tenants/:id', (req, res) => {
+  try {
+    const tenants = readJSONFile('tenants.json');
+    const filtered = tenants.filter(t => t.id !== parseInt(req.params.id));
+    
+    if (filtered.length === tenants.length) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    if (writeJSONFile('tenants.json', filtered)) {
+      res.json({ message: 'Tenant deleted successfully' });
+    } else {
+      res.status(500).json({ error: 'Failed to delete tenant' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete tenant' });
   }
 });
 

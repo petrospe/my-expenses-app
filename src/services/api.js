@@ -64,6 +64,30 @@ class ApiService {
     return this.request('/tenants');
   }
 
+  async getTenant(id) {
+    return this.request(`/tenants/${id}`);
+  }
+
+  async createTenant(tenant) {
+    return this.request('/tenants', {
+      method: 'POST',
+      body: JSON.stringify(tenant),
+    });
+  }
+
+  async updateTenant(id, tenant) {
+    return this.request(`/tenants/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(tenant),
+    });
+  }
+
+  async deleteTenant(id) {
+    return this.request(`/tenants/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Heating
   async getHeating() {
     return this.request('/heating');
