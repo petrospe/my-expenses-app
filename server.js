@@ -207,6 +207,7 @@ app.post('/api/tenants', (req, res) => {
         elevator: 0,
         heating: 0,
         common: 0,
+        equal: 0,
         fi: 0,
         emergency: 0,
         ei: 0
@@ -289,6 +290,21 @@ app.get('/api/building', (req, res) => {
     res.json(building);
   } catch (error) {
     res.status(500).json({ error: 'Failed to load building info' });
+  }
+});
+
+// Update building info
+app.put('/api/building', (req, res) => {
+  try {
+    const buildingData = req.body;
+    
+    if (writeJSONFile('building.json', buildingData)) {
+      res.json(buildingData);
+    } else {
+      res.status(500).json({ error: 'Failed to update building info' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update building info' });
   }
 });
 

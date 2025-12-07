@@ -8,6 +8,7 @@ import Calculate from './pages/Calculate.jsx';
 import Archive from './pages/Archive.jsx';
 import AddExpense from './pages/AddExpense.jsx';
 import ViewLocalStorage from './pages/ViewLocalStorage.jsx';
+import Settings from './pages/Settings.jsx';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/archive" element={<Archive />} />
           <Route path="/add-expense" element={<AddExpense />} />
           <Route path="/view-storage" element={<ViewLocalStorage />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>
     </div>

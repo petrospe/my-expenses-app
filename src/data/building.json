@@ -4,5 +4,13 @@
   "manager": "Φ.Διαχειριστίδης, 697-1234567",
   "processor": "",
   "year": 2025,
-  "month": 12
+  "month": 12,
+  "factors": {
+    "common": 0,
+    "elevator": 0,
+    "heating": 0,
+    "equal": 0,
+    "fi": 0,
+    "ei": 0
+  }
 }

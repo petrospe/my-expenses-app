@@ -25,6 +25,9 @@ function Navigation() {
       <Link to="/archive" className={`nav-link ${isActive('/archive')}`}>
         Αρχείο
       </Link>
+      <Link to="/settings" className={`nav-link ${isActive('/settings')}`}>
+        Ρυθμίσεις
+      </Link>
       <Link to="/view-storage" className={`nav-link ${isActive('/view-storage')}`}>
         LocalStorage
       </Link>

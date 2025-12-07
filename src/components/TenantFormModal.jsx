@@ -19,6 +19,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
       elevator: 0,
       heating: 0,
       common: 0,
+      equal: 0,
       fi: 0,
       emergency: 0,
       ei: 0
@@ -45,6 +46,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
           elevator: tenant.coefficients?.elevator || 0,
           heating: tenant.coefficients?.heating || 0,
           common: tenant.coefficients?.common || 0,
+          equal: tenant.coefficients?.equal || 0,
           fi: tenant.coefficients?.fi || 0,
           emergency: tenant.coefficients?.emergency || 0,
           ei: tenant.coefficients?.ei || 0
@@ -97,6 +99,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
         elevator: parseFloat(formData.coefficients.elevator) || 0,
         heating: parseFloat(formData.coefficients.heating) || 0,
         common: parseFloat(formData.coefficients.common) || 0,
+        equal: parseFloat(formData.coefficients.equal) || 0,
         fi: parseFloat(formData.coefficients.fi) || 0,
         emergency: parseFloat(formData.coefficients.emergency) || 0,
         ei: parseFloat(formData.coefficients.ei) || 0
@@ -287,6 +290,20 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
                   id="coefficients.heating"
                   name="coefficients.heating"
                   value={formData.coefficients.heating}
+                  onChange={handleInputChange}
+                  step="0.01"
+                  min="0"
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="coefficients.equal">Ίσος - Equal (‰)</label>
+                <input
+                  type="number"
+                  id="coefficients.equal"
+                  name="coefficients.equal"
+                  value={formData.coefficients.equal}
                   onChange={handleInputChange}
                   step="0.01"
                   min="0"

@@ -98,6 +98,13 @@ class ApiService {
     return this.request('/building');
   }
 
+  async updateBuilding(building) {
+    return this.request('/building', {
+      method: 'PUT',
+      body: JSON.stringify(building),
+    });
+  }
+
   // Calculation Periods
   async getCalculationPeriods() {
     return this.request('/calculation-periods');
