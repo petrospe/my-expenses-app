@@ -12,11 +12,40 @@ function Calculate() {
   const [currentPeriodName, setCurrentPeriodName] = useState('');
   const [showPeriodForm, setShowPeriodForm] = useState(false);
   const [usedExpenseIds, setUsedExpenseIds] = useState(new Set());
+  const [tenants, setTenants] = useState([]);
+  const [expandedPeriods, setExpandedPeriods] = useState(new Set());
 
   useEffect(() => {
     loadExpenses();
     loadCalculationPeriods();
+    loadTenants();
   }, []);
+
+  const loadTenants = async () => {
+    try {
+      try {
+        const apiTenants = await api.getTenants();
+        setTenants(apiTenants);
+        localStorage.setItem('tenants', JSON.stringify(apiTenants));
+      } catch (apiError) {
+        console.warn('API not available, using localStorage:', apiError);
+        const stored = localStorage.getItem('tenants');
+        if (stored) {
+          try {
+            setTenants(JSON.parse(stored));
+          } catch (e) {
+            console.error('Error loading tenants from localStorage:', e);
+            setTenants(tenantsData);
+          }
+        } else {
+          setTenants(tenantsData);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading tenants:', err);
+      setTenants(tenantsData);
+    }
+  };
 
   const loadExpenses = async () => {
     try {
@@ -93,8 +122,9 @@ function Calculate() {
     );
     setTotalExpenses(total);
 
-    // Calculate distribution for each tenant
-    const calcs = tenantsData.map(tenant => {
+    // Calculate distribution for each tenant (use loaded tenants or fallback to tenantsData)
+    const tenantsToUse = tenants.length > 0 ? tenants : tenantsData;
+    const calcs = tenantsToUse.map(tenant => {
       // Common expenses (column 14)
       const commonExpenses = selectedExpenses
         .filter(exp => exp.column === 14)
@@ -152,6 +182,50 @@ function Calculate() {
     setSelectedExpenses([]);
   };
 
+  // Calculate tenant payments for a given set of expenses
+  const calculateTenantPayments = (expensesToCalculate) => {
+    const tenantsToUse = tenants.length > 0 ? tenants : tenantsData;
+    
+    return tenantsToUse.map(tenant => {
+      // Common expenses (column 14)
+      const commonExpenses = expensesToCalculate
+        .filter(exp => exp.column === 14)
+        .reduce((sum, exp) => sum + (parseFloat(exp.amount) || 0), 0);
+
+      // Elevator expenses (column 12)
+      const elevatorExpenses = expensesToCalculate
+        .filter(exp => exp.column === 12)
+        .reduce((sum, exp) => sum + (parseFloat(exp.amount) || 0), 0);
+
+      // Other expenses (column 13) - also use common coefficient
+      const otherExpenses = expensesToCalculate
+        .filter(exp => exp.column === 13)
+        .reduce((sum, exp) => sum + (parseFloat(exp.amount) || 0), 0);
+
+      const commonShare = (commonExpenses * (tenant.coefficients?.common || 0)) / 100;
+      const elevatorShare = (elevatorExpenses * (tenant.coefficients?.elevator || 0)) / 100;
+      const otherShare = (otherExpenses * (tenant.coefficients?.common || 0)) / 100;
+      
+      // Find heating data for this apartment
+      const heating = heatingData.find(h => h.apartmentCode === tenant.code);
+      const heatingCost = heating ? (parseFloat(heating.cost) || 0) : 0;
+
+      const totalShare = commonShare + elevatorShare + otherShare + heatingCost;
+
+      return {
+        tenantId: tenant.id,
+        code: tenant.code,
+        floor: tenant.floor,
+        ownerName: tenant.owner?.name || '',
+        commonShare,
+        elevatorShare,
+        otherShare,
+        heatingCost,
+        totalShare
+      };
+    });
+  };
+
   const handleSaveCalculation = async () => {
     if (!currentPeriodName.trim()) {
       alert('Παρακαλώ εισάγετε όνομα περιόδου!');
@@ -163,12 +237,16 @@ function Calculate() {
       return;
     }
 
+    // Calculate tenant payments for this period
+    const tenantPayments = calculateTenantPayments(selectedExpenses);
+
     const newPeriod = {
       id: Date.now(),
       name: currentPeriodName.trim(),
       date: new Date().toISOString().split('T')[0],
       expenseIds: selectedExpenses.map(e => e.id),
       totalAmount: totalExpenses,
+      tenantPayments: tenantPayments,
       createdAt: new Date().toISOString()
     };
 
@@ -250,11 +328,41 @@ function Calculate() {
       });
       setUsedExpenseIds(usedIds);
 
+      // Remove from expanded periods
+      setExpandedPeriods(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(periodId);
+        return newSet;
+      });
+
       alert('Η περίοδος διαγράφηκε επιτυχώς!');
     } catch (error) {
       console.error('Error deleting period:', error);
       alert('Σφάλμα κατά τη διαγραφή της περιόδου. Παρακαλώ δοκιμάστε ξανά.');
     }
+  };
+
+  const togglePeriodExpansion = (periodId) => {
+    setExpandedPeriods(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(periodId)) {
+        newSet.delete(periodId);
+      } else {
+        newSet.add(periodId);
+      }
+      return newSet;
+    });
+  };
+
+  // Calculate tenant payments for a period (with fallback recalculation if not stored)
+  const getPeriodTenantPayments = (period) => {
+    if (period.tenantPayments && period.tenantPayments.length > 0) {
+      return period.tenantPayments;
+    }
+    
+    // Fallback: recalculate if tenantPayments not stored
+    const periodExpenses = expenses.filter(exp => period.expenseIds.includes(exp.id));
+    return calculateTenantPayments(periodExpenses);
   };
 
   const grandTotal = calculations.reduce((sum, calc) => sum + (calc.totalShare || 0), 0);
@@ -302,36 +410,99 @@ function Calculate() {
 
         {calculationPeriods.length > 0 && (
           <div className="periods-list">
-            <table className="periods-table">
-              <thead>
-                <tr>
-                  <th>Όνομα Περιόδου</th>
-                  <th>Ημερομηνία</th>
-                  <th>Δαπάνες</th>
-                  <th>Σύνολο (€)</th>
-                  <th>Ενέργειες</th>
-                </tr>
-              </thead>
-              <tbody>
-                {calculationPeriods.map((period) => (
-                  <tr key={period.id}>
-                    <td><strong>{period.name}</strong></td>
-                    <td>{new Date(period.date).toLocaleDateString('el-GR')}</td>
-                    <td>{period.expenseIds.length}</td>
-                    <td className="amount">{period.totalAmount.toFixed(2)}</td>
-                    <td>
-                      <button
-                        onClick={() => handleDeletePeriod(period.id)}
-                        className="btn btn-small"
-                        style={{ background: '#dc3545' }}
-                      >
-                        🗑️ Διαγραφή
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {calculationPeriods.map((period) => {
+              const tenantPayments = getPeriodTenantPayments(period);
+              const isExpanded = expandedPeriods.has(period.id);
+              const periodTotal = tenantPayments.reduce((sum, p) => sum + (p.totalShare || 0), 0);
+
+              return (
+                <div key={period.id} className="period-card">
+                  <div className="period-header">
+                    <table className="periods-table">
+                      <thead>
+                        <tr>
+                          <th>Όνομα Περιόδου</th>
+                          <th>Ημερομηνία</th>
+                          <th>Δαπάνες</th>
+                          <th>Σύνολο (€)</th>
+                          <th>Ενέργειες</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <strong>{period.name}</strong>
+                            <button
+                              onClick={() => togglePeriodExpansion(period.id)}
+                              className="btn-expand"
+                              title={isExpanded ? 'Απόκρυψη πίνακα' : 'Εμφάνιση πίνακα'}
+                            >
+                              {isExpanded ? '▼' : '▶'}
+                            </button>
+                          </td>
+                          <td>{new Date(period.date).toLocaleDateString('el-GR')}</td>
+                          <td>{period.expenseIds.length}</td>
+                          <td className="amount">{period.totalAmount.toFixed(2)}</td>
+                          <td>
+                            <button
+                              onClick={() => handleDeletePeriod(period.id)}
+                              className="btn btn-small"
+                              style={{ background: '#dc3545' }}
+                            >
+                              🗑️ Διαγραφή
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {isExpanded && (
+                    <div className="period-tenants-table">
+                      <h4>Κατανομή ανά Διαμέρισμα</h4>
+                      <table className="calculation-table">
+                        <thead>
+                          <tr>
+                            <th>Διαμέρισμα</th>
+                            <th>Όροφος</th>
+                            <th>Ιδιοκτήτης</th>
+                            <th>Κοινοχρήσιμα (€)</th>
+                            <th>Ανελκυστήρας (€)</th>
+                            <th>Λοιπά (€)</th>
+                            <th>Θέρμανση (€)</th>
+                            <th>Σύνολο (€)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {tenantPayments.map((payment) => (
+                            <tr key={payment.tenantId || payment.code}>
+                              <td><strong>{payment.code}</strong></td>
+                              <td>{payment.floor}</td>
+                              <td>{payment.ownerName}</td>
+                              <td className="amount">{payment.commonShare.toFixed(2)}</td>
+                              <td className="amount">{payment.elevatorShare.toFixed(2)}</td>
+                              <td className="amount">{(payment.otherShare || 0).toFixed(2)}</td>
+                              <td className="amount">{payment.heatingCost.toFixed(2)}</td>
+                              <td className="amount total-cell">
+                                <strong>{payment.totalShare.toFixed(2)}</strong>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr className="total-row">
+                            <td colSpan="7"><strong>Σύνολο:</strong></td>
+                            <td className="amount total-cell">
+                              <strong>{periodTotal.toFixed(2)} €</strong>
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

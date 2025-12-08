@@ -332,6 +332,7 @@ app.post('/api/calculation-periods', (req, res) => {
       date: req.body.date || new Date().toISOString().split('T')[0],
       expenseIds: req.body.expenseIds || [],
       totalAmount: req.body.totalAmount || 0,
+      tenantPayments: req.body.tenantPayments || [],
       createdAt: req.body.createdAt || new Date().toISOString()
     };
 

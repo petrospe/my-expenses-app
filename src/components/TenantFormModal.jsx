@@ -262,7 +262,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
                   id="coefficients.common"
                   name="coefficients.common"
                   value={formData.coefficients.common}
-                  onChange={handleInputChange}
+                  readOnly
                   step="0.01"
                   min="0"
                   className="form-input"
@@ -276,7 +276,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
                   id="coefficients.elevator"
                   name="coefficients.elevator"
                   value={formData.coefficients.elevator}
-                  onChange={handleInputChange}
+                  readOnly
                   step="0.01"
                   min="0"
                   className="form-input"
@@ -290,7 +290,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
                   id="coefficients.heating"
                   name="coefficients.heating"
                   value={formData.coefficients.heating}
-                  onChange={handleInputChange}
+                  readOnly
                   step="0.01"
                   min="0"
                   className="form-input"
@@ -304,7 +304,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
                   id="coefficients.equal"
                   name="coefficients.equal"
                   value={formData.coefficients.equal}
-                  onChange={handleInputChange}
+                  readOnly
                   step="0.01"
                   min="0"
                   className="form-input"
@@ -318,7 +318,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
                   id="coefficients.fi"
                   name="coefficients.fi"
                   value={formData.coefficients.fi}
-                  onChange={handleInputChange}
+                  readOnly
                   step="0.01"
                   min="0"
                   max="1"
@@ -333,7 +333,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
                   id="coefficients.ei"
                   name="coefficients.ei"
                   value={formData.coefficients.ei}
-                  onChange={handleInputChange}
+                  readOnly
                   step="0.0001"
                   min="0"
                   className="form-input"
@@ -347,7 +347,7 @@ function TenantFormModal({ tenant, onClose, onSave, isEdit = false }) {
                   id="coefficients.emergency"
                   name="coefficients.emergency"
                   value={formData.coefficients.emergency}
-                  onChange={handleInputChange}
+                  readOnly
                   step="0.01"
                   min="0"
                   className="form-input"
